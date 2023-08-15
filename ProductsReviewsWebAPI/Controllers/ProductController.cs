@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductsReviewsWebAPI.Data;
 using ProductsReviewsWebAPI.DTOs;
 using ProductsReviewsWebAPI.Models;
@@ -39,16 +40,16 @@ namespace ProductsReviewsWebAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = _context.Products.Include(p => p.Reviews).FirstOrDefault(p => p.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
             var productDTO = new ProductDTO
             {
-                Id = product.Id,
+                Id = id,
                 Name = product.Name,
-                Reviews = product.Reviews.Select(r => new ReviewDTO
+                Reviews = product.Reviews.Where(r => r.ProductId == id).Select(r => new ReviewDTO
                 {
                     Id = r.Id,
                     Rating = r.Rating,
@@ -66,7 +67,18 @@ namespace ProductsReviewsWebAPI.Controllers
             {
                 _context.Products.Add(product);
                 _context.SaveChanges();
-                return StatusCode(201, product);
+                var productDTO = new ProductDTO
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Reviews = product.Reviews.Select(r => new ReviewDTO
+                    {
+                        Id = r.Id,
+                        Rating = r.Rating,
+                        Text = r.Text,
+                    }).ToList()
+                };
+                return StatusCode(201, productDTO);
             }
             return BadRequest();  
             
@@ -85,7 +97,18 @@ namespace ProductsReviewsWebAPI.Controllers
             productToUpdate.Price = product.Price;
             _context.Products.Update(productToUpdate);
             _context.SaveChanges();
-            return Ok(productToUpdate);
+            var productDTO = new ProductDTO
+            {
+                Id = productToUpdate.Id,
+                Name = productToUpdate.Name,
+                Reviews = productToUpdate.Reviews.Select(r => new ReviewDTO
+                {
+                    Id = r.Id,
+                    Rating = r.Rating,
+                    Text = r.Text,
+                }).ToList()
+            };
+            return Ok(productDTO);
         }
 
         // DELETE api/<ReviewController>/5
