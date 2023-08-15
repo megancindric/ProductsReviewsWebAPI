@@ -19,19 +19,25 @@ namespace ProductsReviewsWebAPI.Controllers
         }
         // GET: api/<ProductController>
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] int? maxPrice)
         {
+
             var products = _context.Products.Select(p => new ProductDTO
             {
                 Id = p.Id,
                 Name = p.Name,
+                Price = p.Price,
                 Reviews = p.Reviews.Select(r => new ReviewDTO
                 {
                     Id = r.Id,
                     Rating = r.Rating,
                     Text = r.Text,
                 }).ToList()
-            });
+            });           
+            if (maxPrice != null)
+            {
+                products = products.Where(p => p.Price < maxPrice);
+            }
        
             return Ok(products);
         }
@@ -49,6 +55,7 @@ namespace ProductsReviewsWebAPI.Controllers
             {
                 Id = id,
                 Name = product.Name,
+                Price = product.Price,
                 Reviews = product.Reviews.Where(r => r.ProductId == id).Select(r => new ReviewDTO
                 {
                     Id = r.Id,
@@ -71,6 +78,7 @@ namespace ProductsReviewsWebAPI.Controllers
                 {
                     Id = product.Id,
                     Name = product.Name,
+                    Price = product.Price,
                     Reviews = product.Reviews.Select(r => new ReviewDTO
                     {
                         Id = r.Id,
@@ -88,7 +96,7 @@ namespace ProductsReviewsWebAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Product product)
         {
-            var productToUpdate = _context.Products.Find(id);
+            var productToUpdate = _context.Products.Include(p => p.Reviews).SingleOrDefault(p => p.Id == id);
             if (productToUpdate == null)
             {
                 return NotFound();
@@ -101,6 +109,7 @@ namespace ProductsReviewsWebAPI.Controllers
             {
                 Id = productToUpdate.Id,
                 Name = productToUpdate.Name,
+                Price = productToUpdate.Price,
                 Reviews = productToUpdate.Reviews.Select(r => new ReviewDTO
                 {
                     Id = r.Id,
