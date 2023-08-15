@@ -22,7 +22,7 @@ namespace ProductsReviewsWebAPI.Controllers
         public IActionResult Get([FromQuery] int? maxPrice)
         {
 
-            var products = _context.Products.Select(p => new ProductDTO
+            var products = _context.Products.Include(p => p.Reviews).Select(p => new ProductDTO
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -56,6 +56,7 @@ namespace ProductsReviewsWebAPI.Controllers
                 Id = id,
                 Name = product.Name,
                 Price = product.Price,
+                AverageRating = product.Reviews.Average(r => r.Rating),
                 Reviews = product.Reviews.Where(r => r.ProductId == id).Select(r => new ReviewDTO
                 {
                     Id = r.Id,
