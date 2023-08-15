@@ -36,7 +36,7 @@ namespace ProductsReviewsWebAPI.Controllers
             return Ok(products);
         }
 
-        // GET api/<ReviewController>/5
+        // GET api/<ProductController>/5
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -59,7 +59,7 @@ namespace ProductsReviewsWebAPI.Controllers
             return Ok(productDTO);
         }
 
-        // POST api/<ReviewController>
+        // POST api/<ProductController>
         [HttpPost]
         public IActionResult Post([FromBody] Product product)
         {
@@ -84,7 +84,7 @@ namespace ProductsReviewsWebAPI.Controllers
             
         }
 
-        // PUT api/<ReviewController>/5
+        // PUT api/<ProductController>/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Product product)
         {
@@ -111,7 +111,7 @@ namespace ProductsReviewsWebAPI.Controllers
             return Ok(productDTO);
         }
 
-        // DELETE api/<ReviewController>/5
+        // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductsReviewsWebAPI.Data;
 using ProductsReviewsWebAPI.DTOs;
 using ProductsReviewsWebAPI.Models;
@@ -104,6 +105,18 @@ namespace ProductsReviewsWebAPI.Controllers
             _context.Reviews.Remove(review);
             _context.SaveChanges();
             return NoContent();
+        }
+        // GET api/<ReviewController>/ReviewsByProduct/5
+        [HttpGet("ReviewsByProduct/{id}")]
+        public IActionResult GetByProductId(int id)
+        {
+            var productReviews = _context.Reviews.Where(r => r.ProductId == id).Select(r => new ReviewDTO
+            {
+                Id=r.Id,
+                Text = r.Text,
+                Rating = r.Rating,
+            }).ToList();
+            return Ok(productReviews);
         }
     }
 }
