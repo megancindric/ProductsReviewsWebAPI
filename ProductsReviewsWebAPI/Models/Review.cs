@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProductsReviewsWebAPI.Models
@@ -11,6 +12,6 @@ namespace ProductsReviewsWebAPI.Models
         public int Rating { get; set; }
         [ForeignKey("Product")]
         public int ProductId { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual Product? Product { get; set; }
     }
 }

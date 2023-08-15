@@ -62,10 +62,13 @@ namespace ProductsReviewsWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Product product)
         {
-
+            if (ModelState.IsValid)
+            {
                 _context.Products.Add(product);
                 _context.SaveChanges();
                 return StatusCode(201, product);
+            }
+            return BadRequest();  
             
         }
 

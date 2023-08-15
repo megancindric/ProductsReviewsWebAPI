@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductsReviewsWebAPI.Data;
+using ProductsReviewsWebAPI.DTOs;
 using ProductsReviewsWebAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,7 +20,12 @@ namespace ProductsReviewsWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var reviews = _context.Reviews.ToList();
+            var reviews = _context.Reviews.Select(r => new ReviewDTO
+            {
+                Id = r.Id,
+                Text = r.Text,
+                Rating = r.Rating,
+            }).ToList();
             return Ok(reviews);
         }
 
@@ -28,24 +34,40 @@ namespace ProductsReviewsWebAPI.Controllers
         public IActionResult Get(int id)
         {
             var review = _context.Reviews.Find(id);
+
             if (review == null)
             {
                 return NotFound();
-            }
-            return Ok(review);
+            }            
+            var reviewDTO = new ReviewDTO
+            {
+                Id = id,
+                Text = review.Text,
+                Rating = review.Rating,
+            };
+            return Ok(reviewDTO);
         }
 
         // POST api/<ReviewController>
         [HttpPost]
         public IActionResult Post([FromBody] Review review)
         {
-            if (ModelState.IsValid)
+            var product = _context.Products.Find(review.ProductId);
+            if (product == null)
             {
+                return BadRequest("Invalid Product ID");
+            }
+                review.Product = product;
                 _context.Reviews.Add(review);
                 _context.SaveChanges();
-                return StatusCode(201, review);
-            }
-            return BadRequest(ModelState);
+            var reviewDTO = new ReviewDTO
+            {
+                Id = review.Id,
+                Text = review.Text,
+                Rating = review.Rating,
+            };
+                return StatusCode(201, reviewDTO);
+            
         }
 
         // PUT api/<ReviewController>/5
@@ -61,7 +83,13 @@ namespace ProductsReviewsWebAPI.Controllers
             reviewToUpdate.Rating = review.Rating;
             _context.Reviews.Update(reviewToUpdate);
             _context.SaveChanges();
-            return Ok(reviewToUpdate);
+            var reviewDTO = new ReviewDTO
+            {
+                Id = id,
+                Text = reviewToUpdate.Text,
+                Rating = reviewToUpdate.Rating,
+            };
+            return Ok(reviewDTO);
         }
 
         // DELETE api/<ReviewController>/5
