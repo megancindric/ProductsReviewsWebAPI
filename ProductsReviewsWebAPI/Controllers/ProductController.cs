@@ -75,19 +75,8 @@ namespace ProductsReviewsWebAPI.Controllers
             {
                 _context.Products.Add(product);
                 _context.SaveChanges();
-                var productDTO = new ProductDTO
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Price = product.Price,
-                    Reviews = product.Reviews.Select(r => new ReviewDTO
-                    {
-                        Id = r.Id,
-                        Rating = r.Rating,
-                        Text = r.Text,
-                    }).ToList()
-                };
-                return StatusCode(201, productDTO);
+
+                return StatusCode(201, product);
             }
             return BadRequest();  
             

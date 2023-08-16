@@ -12,6 +12,6 @@ namespace ProductsReviewsWebAPI.Models
         public int Rating { get; set; }
         [ForeignKey("Product")]
         public int ProductId { get; set; }
-        public virtual Product? Product { get; set; }
+        public virtual Product Product { get; set; }
     }
 }
