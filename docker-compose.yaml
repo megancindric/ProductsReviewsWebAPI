@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  db:
+    build: ./database
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db-data:/var/lib/mysql
+  api:
+    build: ./ProductsReviewsWebAPI
+    ports:
+      - "5000:80"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DBHOST=db
+volumes:
+  db-data:      
