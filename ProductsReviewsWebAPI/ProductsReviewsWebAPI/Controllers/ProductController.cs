@@ -46,25 +46,25 @@ namespace ProductsReviewsWebAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var product = _context.Products.Include(p => p.Reviews).FirstOrDefault(p => p.Id == id);
-            if (product == null)
+            var product = _context.Products.Include(p => p.Reviews).Select(p => new ProductDTO
             {
-                return NotFound();
-            }
-            var productDTO = new ProductDTO
-            {
-                Id = id,
-                Name = product.Name,
-                Price = product.Price,
-                AverageRating = product.Reviews.Average(r => r.Rating),
-                Reviews = product.Reviews.Where(r => r.ProductId == id).Select(r => new ReviewDTO
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                AverageRating = p.Reviews != null ? p.Reviews.Average(r => r.Rating) : 0,
+                Reviews = p.Reviews != null ? p.Reviews.Select(r => new ReviewDTO
                 {
                     Id = r.Id,
                     Rating = r.Rating,
                     Text = r.Text,
-                }).ToList()
-        };
-            return Ok(productDTO);
+                }).ToList() : new List<ReviewDTO>()
+            }).SingleOrDefault(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+          
+            return Ok(product);
         }
 
         // POST api/<ProductController>
